@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเก็บข้อมูลเป้าหมายการเรียน (แนะแนว)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; }
+        .card-custom { border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: none; }
+        .unclear-goal { background-color: #ffe5e5 !important; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4 mb-5">
+    <h2 class="text-center mb-4 text-primary fw-bold">🎯 ระบบเก็บข้อมูลเป้าหมายการศึกษาต่อ</h2>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <button id="btnStudentView" class="btn btn-primary fw-bold" onclick="switchTab('student')">
+            👨‍🎓 หน้านักเรียนกรอกข้อมูล
+        </button>
+        <button id="btnTeacherView" class="btn btn-outline-danger fw-bold" onclick="accessTeacherTab()">
+            🔒 ปุ่มเข้าสู่ Dashboard สำหรับครู
+        </button>
+    </div>
+
+    <div id="student-section">
+        <div class="card card-custom p-4">
+            <h4 class="mb-3 text-secondary">กรอกข้อมูลส่วนตัวและเป้าหมาย</h4>
+            <form id="goalForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">ชื่อ - นามสกุล</label>
+                        <input type="text" id="stuName" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">เลขที่</label>
+                        <input type="number" id="stuNumber" class="form-control" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">เกรดเฉลี่ย (GPAX)</label>
+                        <input type="number" step="0.01" min="0" max="4" id="stuGpa" class="form-control" required>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h5 class="text-success">เป้าหมายที่ 1 (หลัก)</h5>
+                        <label class="form-label">มหาวิทยาลัย</label>
+                        <select id="uniSelect1" class="form-select mb-2" onchange="toggleOtherUni('1')">
+                            <option value="">-- เลือกมหาวิทยาลัย --</option>
+                            <option value="จุฬาลงกรณ์มหาวิทยาลัย">จุฬาลงกรณ์มหาวิทยาลัย</option>
+                            <option value="มหาวิทยาลัยมหิดล">มหาวิทยาลัยมหิดล</option>
+                            <option value="มหาวิทยาลัยธรรมศาสตร์">มหาวิทยาลัยธรรมศาสตร์</option>
+                            <option value="มหาวิทยาลัยเกษตรศาสตร์">มหาวิทยาลัยเกษตรศาสตร์</option>
+                            <option value="มหาวิทยาลัยเชียงใหม่">มหาวิทยาลัยเชียงใหม่</option>
+                            <option value="มหาวิทยาลัยขอนแก่น">มหาวิทยาลัยขอนแก่น</option>
+                            <option value="มหาวิทยาลัยสงขลานครินทร์">มหาวิทยาลัยสงขลานครินทร์</option>
+                            <option value="สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง">สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง</option>
+                            <option value="มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี</option>
+                            <option value="มหาวิทยาลัยศรีนครินทรวิโรฒ">มหาวิทยาลัยศรีนครินทรวิโรฒ</option>
+                            <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
+                        </select>
+                        <input type="text" id="uniOther1" class="form-control mb-2 hidden" placeholder="ระบุชื่อมหาวิทยาลัย">
+
+                        <label class="form-label">คณะ</label>
+                        <input type="text" id="fac1" class="form-control mb-2" placeholder="เช่น วิศวกรรมศาสตร์">
+                        <label class="form-label">สาขา</label>
+                        <input type="text" id="maj1" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <h5 class="text-secondary">เป้าหมายที่ 2 (สำรอง)</h5>
+                        <label class="form-label">มหาวิทยาลัย</label>
+                        <select id="uniSelect2" class="form-select mb-2" onchange="toggleOtherUni('2')">
+                            <option value="">-- เลือกมหาวิทยาลัย --</option>
+                            <option value="จุฬาลงกรณ์มหาวิทยาลัย">จุฬาลงกรณ์มหาวิทยาลัย</option>
+                            <option value="มหาวิทยาลัยมหิดล">มหาวิทยาลัยมหิดล</option>
+                            <option value="มหาวิทยาลัยธรรมศาสตร์">มหาวิทยาลัยธรรมศาสตร์</option>
+                            <option value="มหาวิทยาลัยเกษตรศาสตร์">มหาวิทยาลัยเกษตรศาสตร์</option>
+                            <option value="มหาวิทยาลัยเชียงใหม่">มหาวิทยาลัยเชียงใหม่</option>
+                            <option value="มหาวิทยาลัยขอนแก่น">มหาวิทยาลัยขอนแก่น</option>
+                            <option value="มหาวิทยาลัยสงขลานครินทร์">มหาวิทยาลัยสงขลานครินทร์</option>
+                            <option value="สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง">สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง</option>
+                            <option value="มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าธนบุรี</option>
+                            <option value="มหาวิทยาลัยศรีนครินทรวิโรฒ">มหาวิทยาลัยศรีนครินทรวิโรฒ</option>
+                            <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
+                        </select>
+                        <input type="text" id="uniOther2" class="form-control mb-2 hidden" placeholder="ระบุชื่อมหาวิทยาลัย">
+
+                        <label class="form-label">คณะ</label>
+                        <input type="text" id="fac2" class="form-control mb-2">
+                        <label class="form-label">สาขา</label>
+                        <input type="text" id="maj2" class="form-control">
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="teacher-section" class="hidden">
+        <div class="card card-custom p-4 mb-4">
+            <h4 class="mb-3 text-danger">📊 Dashboard คัดกรองข้อมูล (สำหรับครู)</h4>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label>กรองตามมหาวิทยาลัย</label>
+                    <input type="text" id="filterUni" class="form-control" placeholder="พิมพ์ชื่อมหาวิทยาลัย..." onkeyup="renderTable()">
+                </div>
+                <div class="col-md-3">
+                    <label>กรองตามคณะ</label>
+                    <input type="text" id="filterFac" class="form-control" placeholder="พิมพ์ชื่อคณะ..." onkeyup="renderTable()">
+                </div>
+                <div class="col-md-3">
+                    <label>เกรดเฉลี่ยขั้นต่ำ</label>
+                    <input type="number" step="0.01" id="filterGpa" class="form-control" placeholder="เช่น 3.00" onkeyup="renderTable()" onchange="renderTable()">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="filterUnclear" onchange="renderTable()">
+                        <label class="form-check-label text-danger fw-bold" for="filterUnclear">แสดงคนเป้าหมายไม่ชัด</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row text-center mb-3">
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded border">นักเรียนทั้งหมด: <strong id="countTotal" class="text-primary">0</strong> คน</div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded border">เป้าหมายชัดเจน: <strong id="countClear" class="text-success">0</strong> คน</div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded border">ยังไม่มีเป้าหมาย: <strong id="countUnclear" class="text-danger">0</strong> คน</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <button class="btn btn-sm btn-info mb-3 text-white" onclick="loadDataFromSheet()">🔄 รีเฟรชข้อมูลล่าสุด</button>
+            <table class="table table-hover bg-white rounded shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>เลขที่</th>
+                        <th>ชื่อ-นามสกุล</th>
+                        <th>GPAX</th>
+                        <th>เป้าหมาย 1 (ม. / คณะ / สาขา)</th>
+                        <th>เป้าหมาย 2 (ม. / คณะ / สาขา)</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                    </tbody>
+            </table>
+        </div>
+        <button class="btn btn-danger mt-2" onclick="clearAllData()">ลบข้อมูลทั้งหมดใน Sheet</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyw0TCiAQtgfsfl0SpnKG0z1IM4-0cKbcHIZYd5JRGl7iKA_S0OdDIw3byDcQYuETJ2/exec';
+    let globalStudentsData = []; 
+    let isTeacherAuthenticated = false;
+
+    // ปุ่มกดเพื่อยืนยันรหัสผ่านเข้าดู Dashboard ครู
+    function accessTeacherTab() {
+        if (isTeacherAuthenticated) {
+            switchTab('teacher');
+            return;
+        }
+        
+        const password = prompt('🔒 สำหรับครูเท่านั้น: กรุณากรอกรหัสผ่านเพื่อเข้าดู Dashboard');
+        if (password === 'Admin5/2') {
+            isTeacherAuthenticated = true;
+            document.getElementById('btnTeacherView').classList.remove('btn-outline-danger');
+            document.getElementById('btnTeacherView').classList.add('btn-danger');
+            document.getElementById('btnTeacherView').innerText = '📊 ดู Dashboard (เข้าสู่ระบบแล้ว)';
+            switchTab('teacher');
+        } else if (password !== null) {
+            alert('❌ รหัสผ่านไม่ถูกต้อง');
+        }
+    }
+
+    function switchTab(tab) {
+        if(tab === 'student') {
+            document.getElementById('student-section').classList.remove('hidden');
+            document.getElementById('teacher-section').classList.add('hidden');
+            document.getElementById('btnStudentView').className = 'btn btn-primary fw-bold';
+            if(!isTeacherAuthenticated) {
+                document.getElementById('btnTeacherView').className = 'btn btn-outline-danger fw-bold';
+            }
+        } else {
+            document.getElementById('student-section').classList.add('hidden');
+            document.getElementById('teacher-section').classList.remove('hidden');
+            document.getElementById('btnStudentView').className = 'btn btn-outline-primary fw-bold';
+            document.getElementById('btnTeacherView').className = 'btn btn-danger fw-bold';
+            loadDataFromSheet();
+        }
+    }
+
+    function toggleOtherUni(num) {
+        const select = document.getElementById('uniSelect' + num);
+        const otherInput = document.getElementById('uniOther' + num);
+        if (select.value === 'อื่นๆ') {
+            otherInput.classList.remove('hidden');
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.value = '';
+        }
+    }
+
+    function getUniValue(num) {
+        const selectVal = document.getElementById('uniSelect' + num).value;
+        if (selectVal === 'อื่นๆ') {
+            return document.getElementById('uniOther' + num).value.trim();
+        }
+        return selectVal;
+    }
+
+    document.getElementById('goalForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = 'กำลังบันทึก...';
+        btn.disabled = true;
+
+        const newStudent = {
+            action: 'insert',
+            name: document.getElementById('stuName').value,
+            number: document.getElementById('stuNumber').value,
+            gpa: document.getElementById('stuGpa').value,
+            uni1: getUniValue('1'),
+            fac1: document.getElementById('fac1').value,
+            maj1: document.getElementById('maj1').value,
+            uni2: getUniValue('2'),
+            fac2: document.getElementById('fac2').value,
+            maj2: document.getElementById('maj2').value
+        };
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newStudent)
+        }).then(() => {
+            alert('บันทึกข้อมูลลง Google Sheet เรียบร้อยแล้ว!');
+            document.getElementById('goalForm').reset();
+            toggleOtherUni('1');
+            toggleOtherUni('2');
+            btn.innerText = 'บันทึกข้อมูล';
+            btn.disabled = false;
+        }).catch(err => {
+            alert('เกิดข้อผิดพลาดในการบันทึก');
+            btn.innerText = 'บันทึกข้อมูล';
+            btn.disabled = false;
+        });
+    });
+
+    async function loadDataFromSheet() {
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">กำลังโหลดข้อมูลจาก Google Sheet... ⏳</td></tr>';
+        
+        try {
+            const response = await fetch(SCRIPT_URL);
+            globalStudentsData = await response.json();
+            renderTable();
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">ไม่สามารถโหลดข้อมูลได้ ตรวจสอบ URL หรือสิทธิ์การเข้าถึง</td></tr>';
+        }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('dataTableBody');
+        tbody.innerHTML = '';
+
+        const fUni = document.getElementById('filterUni').value.toLowerCase();
+        const fFac = document.getElementById('filterFac').value.toLowerCase();
+        const fGpa = parseFloat(document.getElementById('filterGpa').value) || 0;
+        const fUnclear = document.getElementById('filterUnclear').checked;
+
+        let total = 0, clearCount = 0, unclearCount = 0;
+
+        globalStudentsData.forEach(s => {
+            const isUnclear = (!s.uni1 && !s.fac1 && !s.maj1);
+            if (isUnclear) unclearCount++; else clearCount++;
+            total++;
+
+            if (fUnclear && !isUnclear) return;
+            if (fGpa > s.gpa) return;
+            const matchUni = (s.uni1||'').toLowerCase().includes(fUni) || (s.uni2||'').toLowerCase().includes(fUni);
+            const matchFac = (s.fac1||'').toLowerCase().includes(fFac) || (s.fac2||'').toLowerCase().includes(fFac);
+            
+            if (fUni && !matchUni) return;
+            if (fFac && !matchFac) return;
+
+            const tr = document.createElement('tr');
+            if (isUnclear) tr.classList.add('unclear-goal');
+            
+            tr.innerHTML = `
+                <td>${s.number}</td>
+                <td>${s.name}</td>
+                <td>${s.gpa}</td>
+                <td>${s.uni1 || '-'} / ${s.fac1 || '-'} / ${s.maj1 || '-'}</td>
+                <td>${s.uni2 || '-'} / ${s.fac2 || '-'} / ${s.maj2 || '-'}</td>
+                <td>${isUnclear ? '<span class="badge bg-danger">ยังไม่ชัดเจน</span>' : '<span class="badge bg-success">ชัดเจน</span>'}</td>
+                <td><button class="btn btn-sm btn-outline-danger" onclick="deleteStudent('${s.id}')">ลบ</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('countTotal').innerText = total;
+        document.getElementById('countClear').innerText = clearCount;
+        document.getElementById('countUnclear').innerText = unclearCount;
+    }
+
+    function deleteStudent(id) {
+        if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้ออกจาก Sheet?')) {
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'delete', id: id })
+            }).then(() => {
+                globalStudentsData = globalStudentsData.filter(s => s.id != id);
+                renderTable();
+            });
+        }
+    }
+
+    function clearAllData() {
+        if(confirm('คำเตือนอันตราย: คุณต้องการลบข้อมูลทั้งหมดใน Google Sheet จริงๆ ใช่ไหม?')) {
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'clearAll' })
+            }).then(() => {
+                globalStudentsData = [];
+                renderTable();
+                alert('ส่งคำสั่งลบข้อมูลทั้งหมดไปยัง Sheet แล้ว');
+            });
+        }
+    }
+</script>
+</body>
+</html>
